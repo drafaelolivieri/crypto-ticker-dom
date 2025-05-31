@@ -5,8 +5,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/ .
-RUN mkdir -p templates && mv templates/* templates/
+COPY src/app.py .
+COPY src/test_app.py .
+COPY src/templates ./templates/
 
 ENV PORT=8080
 ENV ENVIRONMENT=staging
