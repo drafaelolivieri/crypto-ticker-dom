@@ -39,14 +39,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup Google Cloud CLI
-      uses: google-github-actions/setup-gcloud@v0
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
       with:
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ env.PROJECT_ID }}
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-    - name: Get GKE credentials
-      uses: google-github-actions/get-gke-credentials@v0
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: 'Get GKE credentials'
+      uses: 'google-github-actions/get-gke-credentials@v1'
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
         location: ${{ env.GKE_ZONE }}
