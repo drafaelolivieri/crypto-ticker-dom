@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: crypto-ticker
+  name: {{ .Release.Name }}
   labels:
-    app: crypto-ticker
+    app: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,4 +11,4 @@ spec:
       targetPort: 8080
       protocol: TCP
   selector:
-    app: crypto-ticker 
+    app: {{ .Release.Name }} 

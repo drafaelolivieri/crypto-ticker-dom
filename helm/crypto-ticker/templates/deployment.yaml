@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crypto-ticker
+  name: {{ .Release.Name }}
   labels:
-    app: crypto-ticker
+    app: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: crypto-ticker
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: crypto-ticker
+        app: {{ .Release.Name }}
     spec:
       containers:
-        - name: crypto-ticker
+        - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
