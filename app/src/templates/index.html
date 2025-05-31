@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Ticker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .ticker-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .ticker-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Crypto Ticker</h1>
+        
+        {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        <form method="post" class="mb-4">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <label for="pair" class="form-label">Selecione o Par:</label>
+                    <select name="pair" id="pair" class="form-select">
+                        {% for pair in available_pairs %}
+                        <option value="{{ pair.symbol }}" {% if pair.symbol == selected_pair %}selected{% endif %}>
+                            {{ pair.desc }} ({{ pair.symbol }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Consultar</button>
+                </div>
+            </div>
+        </form>
+
+        {% if ticker_data and not ticker_data.error %}
+        <div class="ticker-card">
+            <h2>{{ ticker_data.pair }}</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>Último: <span class="ticker-value">{{ ticker_data.last }}</span></p>
+                    <p>Maior: <span class="ticker-value">{{ ticker_data.high }}</span></p>
+                    <p>Menor: <span class="ticker-value">{{ ticker_data.low }}</span></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Compra: <span class="ticker-value">{{ ticker_data.buy }}</span></p>
+                    <p>Venda: <span class="ticker-value">{{ ticker_data.sell }}</span></p>
+                    <p>Volume: <span class="ticker-value">{{ ticker_data.vol }}</span></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Abertura: <span class="ticker-value">{{ ticker_data.open }}</span></p>
+                    <p>Data: <span class="ticker-value">{{ ticker_data.date }}</span></p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
