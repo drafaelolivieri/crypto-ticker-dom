@@ -20,13 +20,13 @@ resources:
 environment: staging
 
 nodeSelector:
-  cloud.google.com/gke-nodepool: staging-pool
+  nodeType: staging
 
 tolerations:
-  - key: "cloud.google.com/gke-nodepool"
+  - key: "nodeType"
     operator: "Equal"
-    value: "staging-pool"
-    effect: "NoSchedule"
+    value: "staging"
+    effect: "PreferNoSchedule"
 
 env:
   - name: PORT

@@ -20,13 +20,13 @@ resources:
 environment: production
 
 nodeSelector:
-  cloud.google.com/gke-nodepool: prod-pool
+  nodeType: prod
 
 tolerations:
-  - key: "cloud.google.com/gke-nodepool"
+  - key: "nodeType"
     operator: "Equal"
-    value: "prod-pool"
-    effect: "NoSchedule"
+    value: "prod"
+    effect: "PreferNoSchedule"
 
 env:
   - name: PORT
