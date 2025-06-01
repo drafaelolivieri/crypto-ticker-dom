@@ -11,21 +11,21 @@ service:
 
 resources:
   limits:
-    cpu: 400m
-    memory: 512Mi
-  requests:
     cpu: 200m
     memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
 environment: production
 
 nodeSelector:
-  pool-type: production
+  cloud.google.com/gke-nodepool: prod-pool
 
 tolerations:
-  - key: "pool-type"
+  - key: "cloud.google.com/gke-nodepool"
     operator: "Equal"
-    value: "production"
+    value: "prod-pool"
     effect: "NoSchedule"
 
 env:

@@ -11,21 +11,21 @@ service:
 
 resources:
   limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
     cpu: 200m
     memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
 environment: staging
 
 nodeSelector:
-  pool-type: staging
+  cloud.google.com/gke-nodepool: staging-pool
 
 tolerations:
-  - key: "pool-type"
+  - key: "cloud.google.com/gke-nodepool"
     operator: "Equal"
-    value: "staging"
+    value: "staging-pool"
     effect: "NoSchedule"
 
 env:
