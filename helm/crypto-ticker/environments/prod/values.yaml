@@ -17,14 +17,16 @@ resources:
     cpu: 200m
     memory: 256Mi
 
+environment: production
+
 nodeSelector:
-  pool-type: production
+  environment: production
 
 tolerations:
-  - key: pool-type
-    operator: Equal
-    value: production
-    effect: PreferNoSchedule
+  - key: "environment"
+    operator: "Equal"
+    value: "production"
+    effect: "NoSchedule"
 
 env:
   - name: PORT

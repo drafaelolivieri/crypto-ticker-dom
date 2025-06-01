@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 2
 
 image:
   repository: nemesisrfl/crypto-ticker
@@ -18,13 +18,13 @@ resources:
     memory: 256Mi
 
 nodeSelector:
-  pool-type: staging
+  environment: staging
 
 tolerations:
-  - key: pool-type
-    operator: Equal
-    value: staging
-    effect: PreferNoSchedule
+  - key: "environment"
+    operator: "Equal"
+    value: "staging"
+    effect: "NoSchedule"
 
 env:
   - name: PORT
