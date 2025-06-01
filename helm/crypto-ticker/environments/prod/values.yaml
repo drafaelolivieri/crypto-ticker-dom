@@ -20,7 +20,7 @@ resources:
 environment: production
 
 nodeSelector:
-  nodeType: prod
+  cloud.google.com/gke-nodepool: prod-pool
 
 tolerations:
   - key: "nodeType"

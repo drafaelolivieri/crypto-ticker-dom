@@ -20,7 +20,7 @@ resources:
 environment: staging
 
 nodeSelector:
-  nodeType: staging
+  cloud.google.com/gke-nodepool: staging-pool
 
 tolerations:
   - key: "nodeType"
