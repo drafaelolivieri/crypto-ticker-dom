@@ -19,6 +19,10 @@ resources:
 
 environment: production
 
+rollingUpdate:
+  maxSurge: 25%
+  maxUnavailable: 0
+
 nodeSelector:
   cloud.google.com/gke-nodepool: prod-pool
 
