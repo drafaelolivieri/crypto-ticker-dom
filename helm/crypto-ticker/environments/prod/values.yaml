@@ -24,7 +24,7 @@ rollingUpdate:
   maxUnavailable: 0
 
 nodeSelector:
-  cloud.google.com/gke-nodepool: gke-crypto-ticker-entrevista-prod-pool-a4f76e0c-tsdl
+  cloud.google.com/gke-nodepool: prod-pool
 
 tolerations:
   - key: "nodeType"
