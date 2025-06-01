@@ -20,13 +20,13 @@ resources:
 environment: staging
 
 nodeSelector:
-  cloud.google.com/gke-nodepool: staging-pool
+  environment: staging
 
 tolerations:
-  - key: "nodeType"
+  - key: "environment"
     operator: "Equal"
     value: "staging"
-    effect: "PreferNoSchedule"
+    effect: "NoSchedule"
 
 env:
   - name: PORT
@@ -42,4 +42,8 @@ env:
     valueFrom:
       secretKeyRef:
         name: crypto-ticker-secrets
-        key: mb_password 
+        key: mb_password
+
+monitoring:
+  enabled: true
+  alertEmail: ${ALERT_EMAIL} 

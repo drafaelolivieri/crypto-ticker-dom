@@ -20,11 +20,11 @@ resources:
 environment: production
 
 rollingUpdate:
-  maxSurge: 0
-  maxUnavailable: 1
+  maxSurge: 25%
+  maxUnavailable: 0
 
 nodeSelector:
-  cloud.google.com/gke-nodepool: prod-pool
+  cloud.google.com/gke-nodepool: gke-crypto-ticker-entrevist-prod-pool-a4f76e0c-tsdl
 
 tolerations:
   - key: "nodeType"
@@ -46,4 +46,8 @@ env:
     valueFrom:
       secretKeyRef:
         name: crypto-ticker-secrets
-        key: mb_password 
+        key: mb_password
+
+monitoring:
+  enabled: true
+  alertEmail: ${ALERT_EMAIL} 
