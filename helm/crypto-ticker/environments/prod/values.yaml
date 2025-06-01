@@ -20,10 +20,10 @@ resources:
 environment: production
 
 nodeSelector:
-  environment: production
+  pool-type: production
 
 tolerations:
-  - key: "environment"
+  - key: "pool-type"
     operator: "Equal"
     value: "production"
     effect: "NoSchedule"

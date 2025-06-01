@@ -17,11 +17,13 @@ resources:
     cpu: 200m
     memory: 256Mi
 
+environment: staging
+
 nodeSelector:
-  environment: staging
+  pool-type: staging
 
 tolerations:
-  - key: "environment"
+  - key: "pool-type"
     operator: "Equal"
     value: "staging"
     effect: "NoSchedule"
