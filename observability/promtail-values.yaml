@@ -1,0 +1,9 @@
+loki:
+  serviceName: loki
+
+resources:
+  requests:
+    memory: 64Mi
+    cpu: 30m
+  limits:
+    memory: 128Mi 

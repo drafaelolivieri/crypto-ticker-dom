@@ -1,0 +1,104 @@
+name: Deploy Observability Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'install'
+        type: choice
+        options:
+          - install
+          - uninstall
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  GKE_CLUSTER: crypto-ticker-${{ github.event.inputs.environment }}
+  GKE_ZONE: us-central1-a
+
+jobs:
+  deploy-observability:
+    name: Deploy Observability Stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.3'
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+
+      - name: Install Observability Stack
+        if: github.event.inputs.action == 'install'
+        working-directory: ./observability
+        run: |
+          # Cria o namespace se não existir
+          kubectl create namespace observability --dry-run=client -o yaml | kubectl apply -f -
+
+          # Instala ou atualiza Loki
+          helm upgrade --install loki grafana/loki \
+            -n observability -f loki-values.yaml
+
+          # Instala ou atualiza Promtail
+          helm upgrade --install promtail grafana/promtail \
+            -n observability -f promtail-values.yaml
+
+          # Instala ou atualiza Prometheus
+          helm upgrade --install prometheus prometheus-community/prometheus \
+            -n observability -f prometheus-values.yaml
+
+          # Instala ou atualiza Grafana
+          helm upgrade --install grafana grafana/grafana \
+            -n observability -f grafana-values.yaml
+
+          # Aguarda todos os pods estarem prontos
+          kubectl wait --for=condition=ready pod --all -n observability --timeout=300s
+
+          # Mostra informações de acesso
+          echo "Grafana admin password:"
+          kubectl get secret --namespace observability grafana -o jsonpath="{.data.admin-password}" | base64 --decode
+          echo -e "\nGrafana URL:"
+          kubectl get svc -n observability grafana -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+
+      - name: Uninstall Observability Stack
+        if: github.event.inputs.action == 'uninstall'
+        run: |
+          helm uninstall -n observability grafana || true
+          helm uninstall -n observability prometheus || true
+          helm uninstall -n observability promtail || true
+          helm uninstall -n observability loki || true
+          kubectl delete namespace observability --ignore-not-found=true 
