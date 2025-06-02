@@ -67,7 +67,8 @@ jobs:
         helm upgrade --install crypto-ticker-staging ./helm/crypto-ticker \
           -f ./helm/crypto-ticker/environments/staging/values.yaml \
           --set image.repository=${{ env.DOCKER_IMAGE }} \
-          --set image.tag=${{ github.sha }}
+          --set image.tag=${{ github.sha }} \
+          --set projectId=${{ env.PROJECT_ID }}
 
   deploy-prod:
     needs: [build-and-push, deploy-staging]
@@ -104,4 +105,5 @@ jobs:
         helm upgrade --install crypto-ticker-prod ./helm/crypto-ticker \
           -f ./helm/crypto-ticker/environments/prod/values.yaml \
           --set image.repository=${{ env.DOCKER_IMAGE }} \
-          --set image.tag=${{ github.sha }} 
+          --set image.tag=${{ github.sha }} \
+          --set projectId=${{ env.PROJECT_ID }} 
