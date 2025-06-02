@@ -29,9 +29,6 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          envFrom:
-            - configMapRef:
-                name: {{ .Release.Name }}-monitoring-config
           env:
             - name: GOOGLE_CLOUD_PROJECT
               value: {{ .Values.projectId }}
