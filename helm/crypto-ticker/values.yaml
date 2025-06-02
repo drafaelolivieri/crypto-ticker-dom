@@ -24,10 +24,7 @@ resources:
     cpu: 50m
     memory: 32Mi
 
-podAnnotations:
-  prometheus.io/scrape: "true"
-  prometheus.io/path: "/metrics"
-  prometheus.io/port: "8080"
+podAnnotations: {}
 
 livenessProbe:
   httpGet:
@@ -42,10 +39,6 @@ readinessProbe:
     port: 8080
   initialDelaySeconds: 5
   periodSeconds: 5
-
-monitoring:
-  enabled: true
-  alertEmail: "alerts@example.com"  # Substituir pelo email real
 
 serviceAccount:
   create: true

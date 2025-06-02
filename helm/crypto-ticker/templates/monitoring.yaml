@@ -1,102 +1,12 @@
 {{- if .Values.monitoring.enabled }}
-apiVersion: monitoring.googleapis.com/v1
-kind: Dashboard
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: crypto-ticker-dashboard
-spec:
-  displayName: "Crypto Ticker Dashboard"
-  gridLayout:
-    columns: "2"
-    widgets:
-      - title: "Request Latency"
-        xyChart:
-          dataSets:
-            - timeSeriesQuery:
-                timeSeriesFilter:
-                  filter: 'metric.type="custom.googleapis.com/flask/request_latency_seconds" resource.type="k8s_container"'
-                  aggregation:
-                    alignmentPeriod: "60s"
-                    perSeriesAligner: "ALIGN_PERCENTILE_99"
-      - title: "Request Rate"
-        xyChart:
-          dataSets:
-            - timeSeriesQuery:
-                timeSeriesFilter:
-                  filter: 'metric.type="custom.googleapis.com/flask/request_count" resource.type="k8s_container"'
-                  aggregation:
-                    alignmentPeriod: "60s"
-                    perSeriesAligner: "ALIGN_RATE"
-      - title: "Error Rate"
-        xyChart:
-          dataSets:
-            - timeSeriesQuery:
-                timeSeriesFilter:
-                  filter: 'metric.type="custom.googleapis.com/flask/error_count" resource.type="k8s_container"'
-                  aggregation:
-                    alignmentPeriod: "60s"
-                    perSeriesAligner: "ALIGN_RATE"
-      - title: "Memory Usage"
-        xyChart:
-          dataSets:
-            - timeSeriesQuery:
-                timeSeriesFilter:
-                  filter: 'metric.type="kubernetes.io/container/memory/used_bytes" resource.type="k8s_container" resource.label."container_name"="crypto-ticker"'
-                  aggregation:
-                    alignmentPeriod: "60s"
-                    perSeriesAligner: "ALIGN_MEAN"
----
-apiVersion: monitoring.googleapis.com/v1
-kind: AlertPolicy
-metadata:
-  name: crypto-ticker-alerts
-spec:
-  displayName: "Crypto Ticker Alerts"
-  combiningGroupBy:
-    - labels:
-      - environment
-  conditions:
-    - displayName: "High Error Rate"
-      conditionThreshold:
-        filter: >
-          metric.type="custom.googleapis.com/flask/error_count"
-          resource.type="k8s_container"
-        aggregations:
-          alignmentPeriod: 300s
-          perSeriesAligner: ALIGN_RATE
-        comparison: COMPARISON_GT
-        thresholdValue: 0.05
-        duration: 300s
-        trigger:
-          count: 1
-    - displayName: "High Latency"
-      conditionThreshold:
-        filter: >
-          metric.type="custom.googleapis.com/flask/request_latency_seconds"
-          resource.type="k8s_container"
-        aggregations:
-          alignmentPeriod: 300s
-          perSeriesAligner: ALIGN_PERCENTILE_95
-        comparison: COMPARISON_GT
-        thresholdValue: 2.0
-        duration: 300s
-        trigger:
-          count: 1
-    - displayName: "High Memory Usage"
-      conditionThreshold:
-        filter: >
-          metric.type="kubernetes.io/container/memory/used_bytes"
-          resource.type="k8s_container"
-          resource.label."container_name"="crypto-ticker"
-        aggregations:
-          alignmentPeriod: 300s
-          perSeriesAligner: ALIGN_MEAN
-        comparison: COMPARISON_GT
-        thresholdValue: 52428800
-        duration: 300s
-        trigger:
-          count: 1
-  notificationChannels:
-    - type: email
-      labels:
-        email_address: {{ .Values.monitoring.alertEmail }}
+  name: {{ .Release.Name }}-monitoring-config
+  labels:
+    app: {{ .Release.Name }}
+    environment: {{ .Values.environment }}
+data:
+  OTEL_PYTHON_CLOUD_TRACE_PROPAGATOR: "true"
+  OTEL_SERVICE_NAME: "crypto-ticker-{{ .Values.environment }}"
 {{- end }} 

@@ -46,8 +46,4 @@ env:
     valueFrom:
       secretKeyRef:
         name: crypto-ticker-secrets
-        key: mb_password
-
-monitoring:
-  enabled: true
-  alertEmail: ${ALERT_EMAIL} 
+        key: mb_password 
