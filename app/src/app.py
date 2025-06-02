@@ -2,10 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import requests
 import os
 from datetime import datetime
-from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
-metrics = PrometheusMetrics(app)
 
 # === CONFIGURAÇÕES ===
 app.config['JSON_AS_ASCII'] = False  # Permite caracteres não-ASCII no JSON
@@ -112,8 +110,6 @@ def index():
                            error_message=error_message)
 
 @app.route('/ticker/<pair>')
-@metrics.counter('ticker_requests_total', 'Number of ticker requests',
-                labels={'status': lambda r: r.status_code})
 def api_ticker(pair):
     # Tenta obter os dados do ticker diretamente
     result = get_ticker_data(pair)
@@ -139,7 +135,6 @@ def api_ticker(pair):
     return jsonify(response)
 
 @app.route('/health')
-@metrics.do_not_track()
 def health():
     """Endpoint de health check"""
     return jsonify({"status": "healthy", "environment": ENVIRONMENT})
