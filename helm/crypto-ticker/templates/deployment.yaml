@@ -19,7 +19,7 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
-      serviceAccountName: crypto-ticker-sa
+      serviceAccountName: {{ .Release.Name }}-sa
       containers:
         - name: crypto-ticker
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

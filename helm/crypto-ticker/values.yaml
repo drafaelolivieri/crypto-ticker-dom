@@ -40,12 +40,6 @@ readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 5
 
-serviceAccount:
-  create: true
-  name: crypto-ticker-sa
-  annotations:
-    iam.gke.io/gcp-service-account: crypto-ticker@${PROJECT_ID}.iam.gserviceaccount.com
-
 nodeSelector: {}
 
 tolerations: []

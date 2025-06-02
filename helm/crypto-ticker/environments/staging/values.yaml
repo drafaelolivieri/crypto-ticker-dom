@@ -25,9 +25,6 @@ nodeSelector:
 
 tolerations: []
 
-serviceAccount:
-  name: crypto-ticker-staging-sa
-
 env:
   - name: PORT
     value: "8080"
