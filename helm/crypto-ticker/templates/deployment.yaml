@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crypto-ticker
+  name: {{ .Release.Name }}
   labels:
-    app: crypto-ticker
+    app: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   strategy:
@@ -13,11 +13,11 @@ spec:
       maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }}
   selector:
     matchLabels:
-      app: crypto-ticker
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: crypto-ticker
+        app: {{ .Release.Name }}
     spec:
       serviceAccountName: crypto-ticker-sa
       containers:
