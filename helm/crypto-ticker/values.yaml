@@ -42,7 +42,7 @@ readinessProbe:
 
 serviceAccount:
   create: true
-  name: crypto-ticker-sa
+  name: "crypto-ticker-{{ .Release.Name }}-sa"
   annotations:
     iam.gke.io/gcp-service-account: crypto-ticker@${PROJECT_ID}.iam.gserviceaccount.com
 
