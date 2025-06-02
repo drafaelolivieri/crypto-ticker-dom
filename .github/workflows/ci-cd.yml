@@ -11,6 +11,7 @@ env:
   GKE_CLUSTER: crypto-ticker-entrevista
   GKE_ZONE: us-central1-a
   DOCKER_IMAGE: nemesisrfl/crypto-ticker
+  WORKING_IMAGE_SHA: b273aa8d5b802e784b4e96d24f49d0d0472c6f91
   
 jobs:
   build-and-push:
@@ -24,6 +25,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Pull and retag working image as latest
+      run: |
+        docker pull ${{ env.DOCKER_IMAGE }}:${{ env.WORKING_IMAGE_SHA }}
+        docker tag ${{ env.DOCKER_IMAGE }}:${{ env.WORKING_IMAGE_SHA }} ${{ env.DOCKER_IMAGE }}:latest
+        docker push ${{ env.DOCKER_IMAGE }}:latest
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
       with:
@@ -31,7 +38,6 @@ jobs:
         push: true
         tags: |
           ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-          ${{ env.DOCKER_IMAGE }}:latest
 
   deploy-staging:
     needs: build-and-push
