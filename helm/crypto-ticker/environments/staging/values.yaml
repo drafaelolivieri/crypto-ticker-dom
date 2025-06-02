@@ -21,13 +21,9 @@ environment: staging
 projectId: ${PROJECT_ID}
 
 nodeSelector:
-  environment: staging
+  pool-type: staging
 
-tolerations:
-  - key: "environment"
-    operator: "Equal"
-    value: "staging"
-    effect: "NoSchedule"
+tolerations: []
 
 env:
   - name: PORT

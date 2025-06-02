@@ -24,13 +24,9 @@ rollingUpdate:
   maxUnavailable: 0
 
 nodeSelector:
-  cloud.google.com/gke-nodepool: gke-crypto-ticker-entrevist-prod-pool-a4f76e0c-tsdl
+  pool-type: production
 
-tolerations:
-  - key: "nodeType"
-    operator: "Equal"
-    value: "prod"
-    effect: "PreferNoSchedule"
+tolerations: []
 
 env:
   - name: PORT
