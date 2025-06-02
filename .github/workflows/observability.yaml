@@ -21,8 +21,8 @@ on:
           - uninstall
 
 env:
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  GKE_CLUSTER: crypto-ticker-${{ github.event.inputs.environment }}
+  PROJECT_ID: entrevista-nemesisrfl
+  GKE_CLUSTER: crypto-ticker-entrevista
   GKE_ZONE: us-central1-a
 
 jobs:
@@ -43,7 +43,7 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.PROJECT_ID }}
+          project_id: entrevista-nemesisrfl
 
       - name: Get GKE credentials
         uses: google-github-actions/get-gke-credentials@v1
