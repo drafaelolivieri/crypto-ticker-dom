@@ -2,6 +2,7 @@ kube-prometheus-stack:
   fullnameOverride: prometheus
   grafana:
     enabled: true
+    replicas: 1
     service:
       type: ClusterIP
     persistence:
@@ -16,14 +17,21 @@ kube-prometheus-stack:
         enabled: true
         org_role: Admin
       server:
-        root_url: http://localhost:3001
+        domain: cs-us-east1-yeah.cloudshell.dev
+        root_url: https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
         serve_from_sub_path: true
+      database:
+        cache_mode: shared
+        wal_enabled: true
+        busy_timeout: 30000
       dataproxy:
         timeout: 30
         keep_alive_seconds: 30
         expect_continue_timeout_seconds: 1
         idle_conn_timeout_seconds: 90
         response_limit: 0
+    strategy:
+      type: Recreate
     additionalDataSources:
       - name: Tempo
         type: tempo
