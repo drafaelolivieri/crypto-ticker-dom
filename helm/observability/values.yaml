@@ -41,9 +41,13 @@ kube-prometheus-stack:
       containers:
         - name: prometheus
           args:
+            - --config.file=/etc/prometheus/prometheus.yaml
+            - --storage.tsdb.path=/prometheus
             - --web.enable-admin-api
             - --web.enable-lifecycle
             - --web.cors.origin=.*
+      configMaps:
+        - prometheus-config
 
 tempo:
   enabled: true
