@@ -16,20 +16,26 @@ kube-prometheus-stack:
     podAnnotations:
       cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     startupProbe:
-      enabled: true
       failureThreshold: 10
       initialDelaySeconds: 30
       periodSeconds: 10
+      httpGet:
+        path: /api/health
+        port: 3000
     readinessProbe:
-      enabled: true
       failureThreshold: 3
       timeoutSeconds: 5
       periodSeconds: 10
+      httpGet:
+        path: /api/health
+        port: 3000
     livenessProbe:
-      enabled: true
       failureThreshold: 3
       timeoutSeconds: 5
       periodSeconds: 10
+      httpGet:
+        path: /api/health
+        port: 3000
     grafana.ini:
       server:
         http_port: 3000
