@@ -12,18 +12,6 @@ kube-prometheus-stack:
         type: tempo
         url: http://observability-tempo:3200
         access: proxy
-    ingress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
-        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-      hosts:
-        - host: grafana.local
-          paths:
-            - path: /
-              pathType: Prefix
   prometheus:
     prometheusSpec:
       retention: 15d
@@ -36,55 +24,26 @@ kube-prometheus-stack:
                 storage: 50Gi
       additionalScrapeConfigs:
         - job_name: 'crypto-ticker-staging'
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: environment
+              replacement: staging
           static_configs:
             - targets: ['crypto-ticker-staging:8080']
-              labels:
-                environment: staging
         - job_name: 'crypto-ticker-prod'
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: environment
+              replacement: production
           static_configs:
             - targets: ['crypto-ticker-prod:8080']
-              labels:
-                environment: production
         - job_name: 'tempo'
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: environment
+              replacement: monitoring
           static_configs:
             - targets: ['observability-tempo:3200']
-              labels:
-                environment: monitoring
-    ingress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
-        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-      hosts:
-        - host: prometheus.local
-          paths:
-            - path: /
-              pathType: Prefix
-    config:
-      global:
-        scrape_interval: 15s
-        evaluation_interval: 15s
-      scrape_configs:
-        - job_name: 'prometheus'
-          static_configs:
-            - targets: ['localhost:9090']
-        - job_name: 'crypto-ticker-staging'
-          static_configs:
-            - targets: ['crypto-ticker-staging:8080']
-              labels:
-                environment: staging
-        - job_name: 'crypto-ticker-prod'
-          static_configs:
-            - targets: ['crypto-ticker-prod:8080']
-              labels:
-                environment: production
-        - job_name: 'tempo'
-          static_configs:
-            - targets: ['observability-tempo:3200']
-              labels:
-                environment: monitoring
 
 tempo:
   enabled: true
@@ -105,18 +64,6 @@ tempo:
       backend: local
       local:
         path: /var/tempo/traces
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
-      nginx.ingress.kubernetes.io/cors-allow-origin: "*"
-      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    hosts:
-      - host: tempo.local
-        paths:
-          - path: /
-            pathType: Prefix
   config: |
     server:
       http_listen_port: 3200
