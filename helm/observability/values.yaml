@@ -10,7 +10,7 @@ kube-prometheus-stack:
     additionalDataSources:
       - name: Tempo
         type: tempo
-        url: http://tempo:3100
+        url: http://observability-tempo:3200
         access: proxy
   prometheus:
     prometheusSpec:
@@ -35,19 +35,10 @@ kube-prometheus-stack:
             environment: production
         - job_name: 'tempo'
           static_configs:
-            - targets: ['tempo:3200']
+            - targets: ['observability-tempo:3200']
           labels:
             environment: monitoring
-      containers:
-        - name: prometheus
-          args:
-            - --config.file=/etc/prometheus/config/prometheus.yml
-            - --storage.tsdb.path=/prometheus
-            - --web.enable-admin-api
-            - --web.enable-lifecycle
-            - --web.cors.origin=.*
-    configMapOverrideName: "prometheus-config"
-    prometheusConfigPath: /etc/prometheus/config/prometheus.yml
+    configMapKubeletSyncPeriod: 1m
     config:
       global:
         scrape_interval: 15s
@@ -68,7 +59,7 @@ kube-prometheus-stack:
             environment: production
         - job_name: 'tempo'
           static_configs:
-            - targets: ['tempo:3200']
+            - targets: ['observability-tempo:3200']
           labels:
             environment: monitoring
 
@@ -94,6 +85,9 @@ tempo:
   config: |
     server:
       http_listen_port: 3200
+      cors:
+        allowed_origins: ["*"]
+        allowed_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     distributor:
       receivers:
         otlp:
