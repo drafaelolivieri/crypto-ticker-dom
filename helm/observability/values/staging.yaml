@@ -4,7 +4,7 @@ grafana:
     annotations:
       kubernetes.io/ingress.class: nginx
     hosts:
-      - grafana.crypto-ticker.com
+      - 3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
 
 prometheus:
   server:
