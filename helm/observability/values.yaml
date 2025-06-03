@@ -54,7 +54,6 @@ kube-prometheus-stack:
     persistence:
       enabled: true
       size: 10Gi
-      storageClassName: standard
     terminationGracePeriodSeconds: 10
     strategy:
       type: Recreate
