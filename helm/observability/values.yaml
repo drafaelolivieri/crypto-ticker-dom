@@ -5,10 +5,37 @@ kube-prometheus-stack:
     replicas: 1
     service:
       type: ClusterIP
+      port: 3000
     persistence:
       enabled: true
       size: 10Gi
+      storageClassName: standard
+    terminationGracePeriodSeconds: 10
+    strategy:
+      type: Recreate
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    startupProbe:
+      enabled: true
+      failureThreshold: 10
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      timeoutSeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      timeoutSeconds: 5
+      periodSeconds: 10
     grafana.ini:
+      server:
+        http_port: 3000
+        domain: cs-us-east1-yeah.cloudshell.dev
+        root_url: https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
+        serve_from_sub_path: true
       security:
         allow_embedding: true
       auth:
@@ -16,10 +43,6 @@ kube-prometheus-stack:
       auth.anonymous:
         enabled: true
         org_role: Admin
-      server:
-        domain: cs-us-east1-yeah.cloudshell.dev
-        root_url: https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
-        serve_from_sub_path: true
       database:
         cache_mode: shared
         wal_enabled: true
@@ -30,8 +53,6 @@ kube-prometheus-stack:
         expect_continue_timeout_seconds: 10
         idle_conn_timeout_seconds: 90
         response_limit: 0
-    strategy:
-      type: Recreate
     additionalDataSources:
       - name: Tempo
         type: tempo
