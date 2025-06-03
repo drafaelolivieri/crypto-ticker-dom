@@ -41,12 +41,13 @@ kube-prometheus-stack:
       containers:
         - name: prometheus
           args:
-            - --config.file=/etc/prometheus/prometheus.yaml
+            - --config.file=/etc/prometheus/config/prometheus.yml
             - --storage.tsdb.path=/prometheus
             - --web.enable-admin-api
             - --web.enable-lifecycle
             - --web.cors.origin=.*
     configMapOverrideName: "prometheus-config"
+    prometheusConfigPath: /etc/prometheus/config/prometheus.yml
     config:
       global:
         scrape_interval: 15s
