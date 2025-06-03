@@ -1,5 +1,47 @@
 kube-prometheus-stack:
   fullnameOverride: prometheus
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorSelector: {}
+      podMonitorSelector: {}
+      additionalScrapeConfigs:
+        - job_name: 'google-cloud-monitoring'
+          honor_labels: true
+          metrics_path: /metrics
+          scheme: http
+          static_configs:
+            - targets: ['localhost:9090']
+      sidecarContainers:
+        - name: stackdriver-sidecar
+          image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:0.9.0
+          args:
+            - "--prometheus.wal-directory=/prometheus/wal"
+            - "--stackdriver.project-id=entrevista-nemesisrfl"
+            - "--include={job=~\".*\"}"
+            - "--wall-time=5s"
+            - "--prometheus.api-address=http://localhost:9090"
+            - "--stackdriver.kubernetes.location=us-central1-a"
+            - "--stackdriver.kubernetes.cluster-name=crypto-ticker-entrevista"
+          ports:
+            - name: sidecar
+              containerPort: 9091
+          env:
+            - name: GOOGLE_CLOUD_PROJECT
+              value: "entrevista-nemesisrfl"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/etc/gcp/service-account.json"
+          volumeMounts:
+            - name: prometheus-storage
+              mountPath: /prometheus
+            - name: gcp-creds
+              mountPath: /etc/gcp
+              readOnly: true
+      volumes:
+        - name: gcp-creds
+          secret:
+            secretName: gcp-service-account
   grafana:
     enabled: true
     replicas: 1
