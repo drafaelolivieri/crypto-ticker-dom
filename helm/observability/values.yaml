@@ -38,14 +38,12 @@ kube-prometheus-stack:
             - targets: ['tempo:3200']
           labels:
             environment: monitoring
-    prometheusSpec:
       containers:
         - name: prometheus
           args:
             - --web.enable-admin-api
             - --web.enable-lifecycle
             - --web.cors.origin=.*
-            - --web.cors.methods=GET,POST,PUT,DELETE,OPTIONS
 
 tempo:
   enabled: true
@@ -69,9 +67,6 @@ tempo:
   config: |
     server:
       http_listen_port: 3200
-      cors:
-        allowed_origins: ["*"]
-        allowed_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     distributor:
       receivers:
         otlp:
@@ -96,6 +91,7 @@ tempo:
         backend: local
         local:
           path: /var/tempo/traces
-    search_enabled: true
+  extraArgs:
+    "search.enabled": "true"
 
  
