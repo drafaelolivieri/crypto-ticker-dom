@@ -48,9 +48,6 @@ kube-prometheus-stack:
     service:
       type: ClusterIP
       port: 3000
-    env:
-      - name: GF_SECURITY_ALLOWED_ORIGINS
-        value: "*"
     persistence:
       enabled: true
       size: 10Gi
@@ -80,35 +77,19 @@ kube-prometheus-stack:
       httpGet:
         path: /api/health
         port: 3000
-    grafana.ini:
-      server:
-        http_port: 3000
-        domain: cs-us-east1-yeah.cloudshell.dev
-        root_url: https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
-        serve_from_sub_path: true
-      security:
-        allow_embedding: true
-        cookie_samesite: none
-        cookie_secure: true
-        allowed_origins: https://3001-cs-7bc56a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
-      auth:
-        disable_login_form: false
-      auth.anonymous:
-        enabled: true
-        org_role: Admin
-      database:
-        cache_mode: shared
-        wal_enabled: true
-        busy_timeout: 30000
-      dataproxy:
-        timeout: 300
-        keep_alive_seconds: 60
-        expect_continue_timeout_seconds: 10
-        idle_conn_timeout_seconds: 90
-        response_limit: 0
-      cors:
-        allowed_origins: http://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, http://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
-        csrf_trusted_origins: http://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, http://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
+    extraEnvFrom: []
+    extraConfigmapMounts: []
+    extraSecretMounts: []
+    adminPassword: admin
+    env:
+      GF_SERVER_ROOT_URL: https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_COOKIE_SAMESITE: "none"
+      GF_SECURITY_COOKIE_SECURE: "true"
+      GF_SECURITY_ALLOWED_ORIGINS: "*"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "false"
     additionalDataSources:
       - name: Tempo
         type: tempo
