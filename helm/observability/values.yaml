@@ -1,0 +1,143 @@
+tempo:
+  enabled: true
+  service:
+    type: ClusterIP
+    ports:
+      - name: otlp-grpc
+        port: 4317
+        targetPort: 4317
+      - name: otlp-http
+        port: 4318
+        targetPort: 4318
+      - name: tempo
+        port: 3200
+        targetPort: 3200
+  persistence:
+    enabled: true
+    size: 10Gi
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+  serviceMonitor:
+    enabled: true
+
+prometheus:
+  enabled: true
+  service:
+    type: ClusterIP
+    port: 9090
+  config:
+    scrape_configs:
+      - job_name: 'crypto-ticker'
+        static_configs:
+          - targets: ['crypto-ticker:8080']
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+      - job_name: 'tempo'
+        static_configs:
+          - targets: ['tempo:3200']
+  server:
+    persistentVolume:
+      enabled: true
+      size: 50Gi
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: false
+
+grafana:
+  enabled: true
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 10Gi
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus-server
+          access: proxy
+          isDefault: true
+        - name: Tempo
+          type: tempo
+          url: http://tempo:3100
+          access: proxy
+
+prometheus:
+  server:
+    persistentVolume:
+      enabled: true
+      size: 50Gi
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: false
+  config:
+    scrape_configs:
+      - job_name: 'crypto-ticker-staging'
+        static_configs:
+          - targets: ['crypto-ticker-staging:8080']
+        labels:
+          environment: staging
+      - job_name: 'crypto-ticker-prod'
+        static_configs:
+          - targets: ['crypto-ticker-prod:8080']
+        labels:
+          environment: production
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+        labels:
+          environment: monitoring
+      - job_name: 'tempo'
+        static_configs:
+          - targets: ['tempo:3200']
+        labels:
+          environment: monitoring
+
+tempo:
+  persistence:
+    enabled: true
+    size: 10Gi
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+  serviceMonitor:
+    enabled: true
+  config:
+    search_enabled: true
+    metrics_generator:
+      registry:
+        external_labels:
+          source: tempo
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            include_metadata: true
+          http:
+            include_metadata: true
+
+ 

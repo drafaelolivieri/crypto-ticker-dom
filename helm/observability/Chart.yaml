@@ -1,0 +1,16 @@
+apiVersion: v2
+name: observability
+description: Helm chart para stack de observabilidade (Grafana, Prometheus e Tempo)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: grafana
+    version: 6.50.7
+    repository: https://grafana.github.io/helm-charts
+  - name: prometheus
+    version: 19.6.1
+    repository: https://prometheus-community.github.io/helm-charts
+  - name: tempo
+    version: 1.3.1
+    repository: https://grafana.github.io/helm-charts 

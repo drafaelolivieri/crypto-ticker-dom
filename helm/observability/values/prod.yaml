@@ -1,0 +1,8 @@
+prometheus:
+  server:
+    persistentVolume:
+      size: 100Gi
+
+tempo:
+  persistence:
+    size: 20Gi 

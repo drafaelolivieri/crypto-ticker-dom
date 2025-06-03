@@ -33,8 +33,39 @@ jobs:
           ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           ${{ env.DOCKER_IMAGE }}:latest
 
-  deploy-staging:
+  observability:
     needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: 'Get GKE credentials'
+      uses: 'google-github-actions/get-gke-credentials@v1'
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v1
+      with:
+        version: 'v3.8.1'
+
+    - name: Deploy Observability Stack
+      run: |
+        helm upgrade --install observability ./helm/observability \
+          --set projectId=${{ env.PROJECT_ID }}
+
+  deploy-staging:
+    needs: [build-and-push, observability]
     runs-on: ubuntu-latest
     environment: 
       name: staging
