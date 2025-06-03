@@ -86,6 +86,9 @@ kube-prometheus-stack:
         serve_from_sub_path: true
       security:
         allow_embedding: true
+        cookie_samesite: none
+        cookie_secure: true
+        allowed_origins: https://3001-cs-7bc56a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
       auth:
         disable_login_form: false
       auth.anonymous:
@@ -101,6 +104,9 @@ kube-prometheus-stack:
         expect_continue_timeout_seconds: 10
         idle_conn_timeout_seconds: 90
         response_limit: 0
+      cors:
+        allowed_origins: http://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, http://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
+        csrf_trusted_origins: http://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, http://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev, https://3001-cs-7bc564a6-1c3a-4afa-8e1a-86a29dba4879.cs-us-east1-yeah.cloudshell.dev
     additionalDataSources:
       - name: Tempo
         type: tempo
