@@ -46,8 +46,30 @@ kube-prometheus-stack:
             - --web.enable-admin-api
             - --web.enable-lifecycle
             - --web.cors.origin=.*
-      configMaps:
-        - prometheus-config
+    configMapOverrideName: "prometheus-config"
+    config:
+      global:
+        scrape_interval: 15s
+        evaluation_interval: 15s
+      scrape_configs:
+        - job_name: 'prometheus'
+          static_configs:
+            - targets: ['localhost:9090']
+        - job_name: 'crypto-ticker-staging'
+          static_configs:
+            - targets: ['crypto-ticker-staging:8080']
+          labels:
+            environment: staging
+        - job_name: 'crypto-ticker-prod'
+          static_configs:
+            - targets: ['crypto-ticker-prod:8080']
+          labels:
+            environment: production
+        - job_name: 'tempo'
+          static_configs:
+            - targets: ['tempo:3200']
+          labels:
+            environment: monitoring
 
 tempo:
   enabled: true
