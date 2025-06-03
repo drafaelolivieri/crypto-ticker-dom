@@ -48,6 +48,9 @@ kube-prometheus-stack:
     service:
       type: ClusterIP
       port: 3000
+    env:
+      - name: GF_SECURITY_ALLOWED_ORIGINS
+        value: "*"
     persistence:
       enabled: true
       size: 10Gi
