@@ -22,28 +22,50 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 50Gi
+      serviceMonitorSelector: {}
+      serviceMonitorNamespaceSelector: {}
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelector: {}
+      podMonitorNamespaceSelector: {}
+      podMonitorSelectorNilUsesHelmValues: false
       additionalScrapeConfigs:
-        - job_name: 'crypto-ticker-staging'
-          relabel_configs:
-            - source_labels: [__address__]
+        - job_name: prometheus
+          static_configs:
+            - targets:
+              - localhost:9090
+
+        - job_name: crypto-ticker-staging
+          metrics_path: /metrics
+          scheme: http
+          static_configs:
+            - targets:
+              - crypto-ticker-staging:8080
+          metric_relabel_configs:
+            - source_labels: [__name__]
               target_label: environment
               replacement: staging
+
+        - job_name: crypto-ticker-prod
+          metrics_path: /metrics
+          scheme: http
           static_configs:
-            - targets: ['crypto-ticker-staging:8080']
-        - job_name: 'crypto-ticker-prod'
-          relabel_configs:
-            - source_labels: [__address__]
+            - targets:
+              - crypto-ticker-prod:8080
+          metric_relabel_configs:
+            - source_labels: [__name__]
               target_label: environment
               replacement: production
+
+        - job_name: tempo
+          metrics_path: /metrics
+          scheme: http
           static_configs:
-            - targets: ['crypto-ticker-prod:8080']
-        - job_name: 'tempo'
-          relabel_configs:
-            - source_labels: [__address__]
+            - targets:
+              - observability-tempo:3200
+          metric_relabel_configs:
+            - source_labels: [__name__]
               target_label: environment
               replacement: monitoring
-          static_configs:
-            - targets: ['observability-tempo:3200']
 
 tempo:
   enabled: true
