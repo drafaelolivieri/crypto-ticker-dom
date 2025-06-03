@@ -7,11 +7,41 @@ kube-prometheus-stack:
     persistence:
       enabled: true
       size: 10Gi
+    grafana.ini:
+      security:
+        allow_embedding: true
+      auth:
+        disable_login_form: false
+      auth.anonymous:
+        enabled: true
+        org_role: Admin
+      server:
+        root_url: http://localhost:3001
+        serve_from_sub_path: true
+      dataproxy:
+        timeout: 30
+        keep_alive_seconds: 30
+        expect_continue_timeout_seconds: 1
+        idle_conn_timeout_seconds: 90
+        response_limit: 0
     additionalDataSources:
       - name: Tempo
         type: tempo
-        url: http://observability-tempo:3200
+        url: http://observability-tempo.default.svc.cluster.local:3200
         access: proxy
+        jsonData:
+          httpMethod: GET
+          tracesToLogs:
+            datasourceUid: prometheus
+          serviceMap:
+            datasourceUid: prometheus
+          nodeGraph:
+            enabled: true
+          search:
+            hide: false
+          lokiSearch:
+            datasourceUid: prometheus
+          timeout: 30
   prometheus:
     prometheusSpec:
       retention: 15d
@@ -89,6 +119,10 @@ tempo:
   config: |
     server:
       http_listen_port: 3200
+      grpc_server_max_recv_msg_size: 8388608
+      grpc_server_max_send_msg_size: 8388608
+      http_server_read_timeout: 30s
+      http_server_write_timeout: 30s
     distributor:
       receivers:
         otlp:
