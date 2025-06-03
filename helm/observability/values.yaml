@@ -126,7 +126,7 @@ tempo:
         path: /var/tempo/traces
   serviceMonitor:
     enabled: true
-  config:
+  config: |
     search_enabled: true
     metrics_generator:
       registry:
