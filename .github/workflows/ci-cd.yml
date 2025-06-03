@@ -59,6 +59,17 @@ jobs:
       with:
         version: 'v3.8.1'
 
+    - name: Add Helm Repositories
+      run: |
+        helm repo add grafana https://grafana.github.io/helm-charts
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+
+    - name: Build Helm Dependencies
+      run: |
+        cd helm/observability
+        helm dependency build
+
     - name: Deploy Observability Stack
       run: |
         helm upgrade --install observability ./helm/observability \
