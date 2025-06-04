@@ -5,11 +5,11 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: Helm
   annotations:
-    kubernetes.io/ingress.class: {{ if eq .Release.Name "crypto-ticker-prod" }}gce-prod{{ else }}gce{{ end }}
+    kubernetes.io/ingress.class: {{ if eq .Release.Name "crypto-ticker-prod" }}gce-production{{ else }}gce{{ end }}
     kubernetes.io/ingress.allow-http: "true"
     networking.gke.io/v1beta1.FrontendConfig: {{ .Release.Name }}-frontend-config
 spec:
-  ingressClassName: {{ if eq .Release.Name "crypto-ticker-prod" }}gce-prod{{ else }}gce{{ end }}
+  ingressClassName: {{ if eq .Release.Name "crypto-ticker-prod" }}gce-production{{ else }}gce{{ end }}
   defaultBackend:
     service:
       name: {{ .Release.Name }}
