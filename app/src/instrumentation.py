@@ -10,95 +10,107 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExport
 from prometheus_flask_exporter import PrometheusMetrics
 import os
 
-# Configurações dos endpoints
-TEMPO_ENDPOINT = os.getenv('TEMPO_ENDPOINT', 'http://191.252.111.133:3200')
-PROMETHEUS_ENDPOINT = os.getenv('PROMETHEUS_ENDPOINT', 'http://191.252.111.133:9090')
-LOKI_ENDPOINT = os.getenv('LOKI_ENDPOINT', 'http://191.252.111.133:3100')
+# Configurações dos endpoints (usando serviços internos do cluster)
+TEMPO_ENDPOINT = os.getenv('TEMPO_ENDPOINT', 'http://tempo:4317')
+PROMETHEUS_ENDPOINT = os.getenv('PROMETHEUS_ENDPOINT', 'http://prometheus:9090')
+LOKI_ENDPOINT = os.getenv('LOKI_ENDPOINT', 'http://loki:3100')
+
+# Configuração de fallback para logging quando Loki não está disponível
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 def configure_logging():
     """Configura o logging com Loki"""
-    # Configuração do handler do Loki
-    loki_handler = LokiHandler(
-        url=f"{LOKI_ENDPOINT}/loki/api/v1/push",
-        tags={"application": "crypto-ticker"},
-        version="1",
-    )
-    
-    # Configurar formato do log
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    loki_handler.setFormatter(formatter)
-    
-    # Configurar logger root
-    root_logger = logging.getLogger()
-    root_logger.addHandler(loki_handler)
-    root_logger.setLevel(logging.INFO)
-    
-    # Logger específico da aplicação
-    logger = logging.getLogger('crypto-ticker')
-    logger.setLevel(logging.INFO)
-    
-    return logger
+    try:
+        # Configuração do handler do Loki
+        loki_handler = LokiHandler(
+            url=f"{LOKI_ENDPOINT}/loki/api/v1/push",
+            tags={"application": "crypto-ticker"},
+            version="1",
+        )
+        
+        # Configurar formato do log
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        loki_handler.setFormatter(formatter)
+        
+        # Logger específico da aplicação
+        logger = logging.getLogger('crypto-ticker')
+        logger.setLevel(logging.INFO)
+        logger.addHandler(loki_handler)
+        
+        return logger
+    except Exception as e:
+        # Em caso de erro, retorna um logger padrão
+        logger = logging.getLogger('crypto-ticker')
+        logger.warning(f"Falha ao configurar Loki, usando logging padrão: {str(e)}")
+        return logger
 
 def configure_metrics(app):
     """Configura métricas do Prometheus"""
-    metrics = PrometheusMetrics(app)
-    
-    # Métricas básicas da aplicação
-    metrics.info('app_info', 'Application info', version='1.0.0')
-    
-    # Métricas personalizadas
-    metrics.counter(
-        'crypto_ticker_requests_total',
-        'Number of requests to the crypto ticker',
-        labels={'status': lambda r: r.status_code}
-    )
-    
-    return metrics
+    try:
+        metrics = PrometheusMetrics(app)
+        
+        # Métricas básicas da aplicação
+        metrics.info('app_info', 'Application info', version='1.0.0')
+        
+        # Métricas personalizadas
+        metrics.counter(
+            'crypto_ticker_requests_total',
+            'Number of requests to the crypto ticker',
+            labels={'status': lambda r: r.status_code}
+        )
+        
+        return metrics
+    except Exception as e:
+        logging.warning(f"Falha ao configurar Prometheus metrics: {str(e)}")
+        return None
 
 def configure_traces():
     """Configura traces com OpenTelemetry"""
-    resource = Resource.create({
-        "service.name": "crypto-ticker",
-        "service.version": "1.0.0",
-        "deployment.environment": os.getenv('ENVIRONMENT', 'production')
-    })
-    
-    provider = TracerProvider(resource=resource)
-    
-    # Configurar exportador OTLP para o Tempo
-    otlp_exporter = OTLPSpanExporter(
-        endpoint=f"{TEMPO_ENDPOINT}:4317",  # Porta gRPC do Tempo
-        insecure=True
-    )
-    
-    provider.add_span_processor(BatchSpanProcessor(otlp_exporter))
-    trace.set_tracer_provider(provider)
-    
-    return provider
+    try:
+        resource = Resource.create({
+            "service.name": "crypto-ticker",
+            "service.version": "1.0.0",
+            "deployment.environment": os.getenv('ENVIRONMENT', 'production')
+        })
+        
+        provider = TracerProvider(resource=resource)
+        
+        # Configurar exportador OTLP para o Tempo
+        otlp_exporter = OTLPSpanExporter(
+            endpoint=TEMPO_ENDPOINT,  # Usando a porta gRPC padrão
+            insecure=True
+        )
+        
+        provider.add_span_processor(BatchSpanProcessor(otlp_exporter))
+        trace.set_tracer_provider(provider)
+        
+        return provider
+    except Exception as e:
+        logging.warning(f"Falha ao configurar OpenTelemetry traces: {str(e)}")
+        return None
 
 def configure_telemetry(app):
     """Configura toda a instrumentação de observabilidade"""
-    try:
-        # Configurar logging com Loki
-        logger = configure_logging()
-        logger.info("Iniciando configuração de telemetria")
-        
-        # Configurar traces com OpenTelemetry
-        provider = configure_traces()
-        
+    # Configurar logging primeiro para ter logs disponíveis
+    logger = configure_logging()
+    logger.info("Iniciando configuração de telemetria")
+    
+    # Configurar traces com OpenTelemetry
+    provider = configure_traces()
+    if provider:
         # Instrumentar Flask com OpenTelemetry
-        FlaskInstrumentor().instrument_app(app, tracer_provider=provider)
-        
-        # Instrumentar requests HTTP
-        RequestsInstrumentor().instrument(tracer_provider=provider)
-        
-        # Configurar métricas do Prometheus
-        metrics = configure_metrics(app)
-        
-        logger.info("Configuração de telemetria concluída com sucesso")
-        
-        return logger, metrics
-        
-    except Exception as e:
-        logging.error(f"Erro ao configurar telemetria: {str(e)}", exc_info=True)
-        raise 
+        try:
+            FlaskInstrumentor().instrument_app(app, tracer_provider=provider)
+            RequestsInstrumentor().instrument(tracer_provider=provider)
+        except Exception as e:
+            logger.warning(f"Falha ao instrumentar Flask/Requests: {str(e)}")
+    
+    # Configurar métricas do Prometheus
+    metrics = configure_metrics(app)
+    
+    logger.info("Configuração de telemetria concluída")
+    
+    return logger, metrics 
