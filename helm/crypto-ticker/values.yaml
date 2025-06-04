@@ -85,4 +85,5 @@ tolerations: []
 affinity: {}
 
 ingressClass:
-  create: false 
+  create: false
+  name: gce  # Default name for staging

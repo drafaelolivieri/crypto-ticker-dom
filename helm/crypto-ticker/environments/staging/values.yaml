@@ -42,4 +42,5 @@ env:
         key: mb_password
 
 ingressClass:
-  create: true 
+  create: true
+  name: gce 
