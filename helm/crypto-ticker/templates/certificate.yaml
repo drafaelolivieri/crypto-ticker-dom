@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: crypto-ticker-cert
+spec:
+  domains:
+    - crypto-ticker-34-49-17-144.nip.io 
