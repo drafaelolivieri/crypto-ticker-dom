@@ -10,8 +10,8 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExport
 from prometheus_flask_exporter import PrometheusMetrics
 import os
 
-# Configurações dos endpoints (usando IP externo)
-TEMPO_ENDPOINT = os.getenv('TEMPO_ENDPOINT', 'http://191.252.111.133:3200')
+# Configurações dos endpoints (usando IP externo e portas corretas)
+TEMPO_ENDPOINT = os.getenv('TEMPO_ENDPOINT', 'http://191.252.111.133:4317')  # Usando gRPC
 PROMETHEUS_ENDPOINT = os.getenv('PROMETHEUS_ENDPOINT', 'http://191.252.111.133:9090')
 LOKI_ENDPOINT = os.getenv('LOKI_ENDPOINT', 'http://191.252.111.133:3100')
 
@@ -80,7 +80,7 @@ def configure_traces():
         
         # Configurar exportador OTLP para o Tempo
         otlp_exporter = OTLPSpanExporter(
-            endpoint=f"{TEMPO_ENDPOINT}:4317",  # Porta gRPC do Tempo
+            endpoint=TEMPO_ENDPOINT,  # Já usando a porta gRPC correta
             insecure=True
         )
         
