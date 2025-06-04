@@ -39,4 +39,7 @@ env:
     valueFrom:
       secretKeyRef:
         name: crypto-ticker-secrets
-        key: mb_password 
+        key: mb_password
+
+ingressClass:
+  create: true 
