@@ -4,9 +4,10 @@ metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
     kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: {{ if eq .Release.Name "crypto-ticker-staging" }}"crypto-ticker-staging-ip"{{ else }}"crypto-ticker-ip"{{ end }}
 spec:
   rules:
-  - host: {{ .Release.Name }}-34-49-17-144.nip.io
+  - host: {{ if eq .Release.Name "crypto-ticker-staging" }}crypto-ticker-staging-34-8-145-3.nip.io{{ else }}crypto-ticker-prod-34-49-17-144.nip.io{{ end }}
     http:
       paths:
       - path: /*
