@@ -1,0 +1,6 @@
+namespaceOverride: "monitoring"
+prometheus:
+  enabled: true
+  prometheusSpec:
+    remoteWrite:
+      - url: http://191.252.111.133:9090/api/v1/write 
