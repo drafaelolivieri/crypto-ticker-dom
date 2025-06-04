@@ -60,4 +60,26 @@ env:
     valueFrom:
       secretKeyRef:
         name: crypto-ticker-secrets
-        key: mb_password 
+        key: mb_password
+  - name: TEMPO_ENDPOINT
+    value: "http://191.252.111.133:4317"
+  - name: PROMETHEUS_ENDPOINT
+    value: "http://191.252.111.133:9090"
+  - name: LOKI_ENDPOINT
+    value: "http://191.252.111.133:3100"
+
+observability:
+  enabled: true
+  prometheus:
+    port: 9090
+  tempo:
+    grpcPort: 4317
+    httpPort: 4318
+  loki:
+    port: 3100
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {} 
