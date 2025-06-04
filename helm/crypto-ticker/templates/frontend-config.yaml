@@ -3,7 +3,5 @@ kind: FrontendConfig
 metadata:
   name: {{ .Release.Name }}-frontend-config
 spec:
-  sslPolicy: MODERN
   redirectToHttps:
-    enabled: true
-    responseCodeName: MOVED_PERMANENTLY_DEFAULT 
+    enabled: false 
