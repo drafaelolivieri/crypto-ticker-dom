@@ -7,7 +7,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: "crypto-ticker-ip"
     networking.gke.io/v1beta1.FrontendConfig: "{{ .Release.Name }}-frontend-config"
     networking.gke.io/managed-certificates: "{{ .Release.Name }}-cert"
-    kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.allow-http: "true"
     # Forçando o uso da porta 8080
     cloud.google.com/backend-config: '{"default": "{{ .Release.Name }}-backend-config"}'
 spec:
