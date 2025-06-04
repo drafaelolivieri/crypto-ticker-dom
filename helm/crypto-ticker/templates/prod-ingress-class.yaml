@@ -1,0 +1,14 @@
+{{- if and (eq .Release.Name "crypto-ticker-prod") .Values.ingressClass.create }}
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: {{ .Values.ingressClass.name }}
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "false"
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/managed-by: Helm
+    environment: {{ .Values.environment }}
+spec:
+  controller: kubernetes.io/ingress-gce
+{{- end }} 
