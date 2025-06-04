@@ -8,7 +8,14 @@ metadata:
     networking.gke.io/v1beta1.FrontendConfig: "{{ .Release.Name }}-frontend-config"
     networking.gke.io/managed-certificates: "{{ .Release.Name }}-cert"
     kubernetes.io/ingress.allow-http: "false"
+    # Forçando o uso da porta 8080
+    cloud.google.com/backend-config: '{"default": "{{ .Release.Name }}-backend-config"}'
 spec:
+  defaultBackend:
+    service:
+      name: {{ .Release.Name }}
+      port:
+        number: 8080
   rules:
   - host: {{ .Release.Name }}-34-49-17-144.nip.io
     http:
