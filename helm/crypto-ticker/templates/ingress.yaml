@@ -1,17 +1,26 @@
+{{- if eq .Values.environment "production" }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
   labels:
     app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: {{ .Release.Name }}
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingressClass.name }}
     kubernetes.io/ingress.allow-http: "true"
     networking.gke.io/v1beta1.FrontendConfig: {{ .Release.Name }}-frontend-config
+    kubernetes.io/ingress.global-static-ip-name: "34.54.241.191"
 spec:
   ingressClassName: {{ .Values.ingressClass.name }}
-  defaultBackend:
-    service:
-      name: {{ .Release.Name }}
-      port:
-        number: 8080 
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}
+            port:
+              number: 8080
+{{- end }} 
