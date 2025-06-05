@@ -1,0 +1,14 @@
+{{- if eq .Release.Name "crypto-ticker-staging" }}
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: gce
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/managed-by: Helm
+    environment: staging
+spec:
+  controller: kubernetes.io/ingress-gce
+{{- end }} 
